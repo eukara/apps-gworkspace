@@ -129,11 +129,15 @@ static FSNodeRep *shared = nil;
 
     /* images for which we provide our own resources */
     imagepath = [bundle pathForImageResource: @"FolderOpen"];
-    openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
     imagepath = [bundle pathForImageResource: @"HardDisk"];
-    hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
     imagepath = [bundle pathForImageResource: @"HardDiskOpen"];
-    openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+    imagepath = [bundle pathForImageResource: @"HomeDirOpen"];
+    openHomeDirIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+    imagepath = [bundle pathForImageResource: @"RootDirOpen"];
+    openRootDirIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
     
     iconsCache = [NSMutableDictionary new];
     rootPath = path_separator();

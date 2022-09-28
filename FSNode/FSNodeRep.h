@@ -370,6 +370,8 @@ typedef enum FSNSelectionMask {
   NSImage *openFolderIcon;
   NSImage *hardDiskIcon;
   NSImage *openHardDiskIcon;
+  NSImage *openHomeDirIcon;
+  NSImage *openRootDirIcon;
   NSImage *trashIcon;
   NSImage *trashFullIcon;
   

@@ -128,6 +128,7 @@ static unsigned char darkerLUT[256] = {
   NSImage *icon = nil;
   NSImage *baseIcon = nil;
   NSString *key = nil;
+  BOOL showLink = [[NSUserDefaults standardUserDefaults] boolForKey: @"FSHideLinkSymbols"];
 
   if ([node isDirectory])
     {  
@@ -135,7 +136,7 @@ static unsigned char darkerLUT[256] = {
 	{
 	  key = nodepath;
 	}
-      else if ([node isMountPoint] || [volumes containsObject: nodepath])
+      else if (([node isMountPoint] || [volumes containsObject: nodepath]) && ![node isLink])
 	{
 	  key = @"disk";
 	  baseIcon = hardDiskIcon;
@@ -173,7 +174,7 @@ static unsigned char darkerLUT[256] = {
                 {
                   NSLog(@"no WS icon for %@", nodepath);
                 }
-	      if ([node isLink])
+	      if (!showLink && [node isLink])
 		{
 		  NSImage *linkIcon;
 
@@ -251,7 +252,7 @@ static unsigned char darkerLUT[256] = {
               if (baseIcon == nil)
                 baseIcon = [ws iconForFile: nodepath];
 
-	      if ([node isLink])
+	      if (!showLink && [node isLink])
 		{
 		  NSImage *linkIcon;
 
@@ -347,21 +348,53 @@ static unsigned char darkerLUT[256] = {
 {
   NSString *ipath = [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
   NSImage *icon = nil;
+  BOOL isHomeDir = ([NSHomeDirectory() isEqualToString: [node path]]) ? YES : NO;
+  BOOL isDisk = ([node isMountPoint] || [volumes containsObject: [node path]]) ? YES : NO;
+  BOOL isRoot = [[node path] isEqualToString: @"/"];
 
-  if ([fm isReadableFileAtPath: ipath]) {
-    NSImage *img = [[NSImage alloc] initWithContentsOfFile: ipath];
+	if ([fm isReadableFileAtPath: ipath]) {
+		NSImage *img = [[NSImage alloc] initWithContentsOfFile: ipath];
+		if (img) {
+			icon = AUTORELEASE (img);
+		} else {
+			icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
+		}      
+	} else if (isHomeDir == YES) {
+		NSImage *img = [NSImage imageNamed:@"common_HomeDirectoryOpen"];
 
-    if (img) {
-      icon = AUTORELEASE (img);
-    } else {
-      icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
-    }      
-  } else {
-    if ([node isMountPoint] || [volumes containsObject: [node path]]) {
-      icon = [self darkerIcon: hardDiskIcon];
-    } else {
-      icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
-    }
+		if (img) {
+			icon = AUTORELEASE (img);
+		} else {
+			icon = openHomeDirIcon;
+		} 
+	} else if (isDisk == YES && ![node isLink]) {
+		NSImage *img = [NSImage imageNamed:@"common_DiskOpen"];
+
+		if (img) {
+			icon = AUTORELEASE (img);
+		} else {
+			icon = openHardDiskIcon;
+		} 
+	} else if (isRoot == YES) {
+		NSImage *img = [NSImage imageNamed:@"common_Root_PCOpen"];
+
+		if (img) {
+			icon = AUTORELEASE (img);
+		} else {
+			icon = openRootDirIcon;
+		} 
+	} else {
+		NSImage *img = [NSImage imageNamed:@"common_FolderOpen"];
+
+		if (img) {
+			icon = AUTORELEASE (img);
+		} else {
+			if ([node isMountPoint] || [volumes containsObject: [node path]]) {
+				icon = openHardDiskIcon;
+			} else {
+				icon = openFolderIcon;
+			}
+		} 
   }
 
   if (icon) {
