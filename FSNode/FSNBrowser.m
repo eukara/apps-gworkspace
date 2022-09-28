@@ -1297,100 +1297,107 @@
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	NSString *characters = [theEvent characters];
-	unichar character = 0;
-	FSNBrowserColumn *column = [self selectedColumn];
-	NSMatrix *matrix;
-	
-	if (column == nil) {
+  NSString *characters = [theEvent characters];
+  unichar character = 0;
+  FSNBrowserColumn *column = [self selectedColumn];
+  NSMatrix *matrix;
+  
+  if (column == nil) {
     [super keyDown: theEvent];
-		return;
-	}
+    return;
+  }
   
   matrix = [column cmatrix];
   
-	if (matrix == nil) {
-    [super keyDown: theEvent];
-		return;
-	}
-		
-  if ([characters length] > 0) {
-		character = [characters characterAtIndex: 0];
-	}
-  
-	switch (character) {
-		case NSUpArrowFunctionKey:
-		case NSDownArrowFunctionKey:
+   if (matrix == nil) {
       [super keyDown: theEvent];
-	  	return;
-	
-		case NSLeftArrowFunctionKey:
-			{
-				if ([theEvent modifierFlags] & NSControlKeyMask) {
-	      	[super keyDown: theEvent];
-	    	} else {
-	    		[self moveLeft];
-				}
-			}
       return;
-      
-		case NSRightArrowFunctionKey:
-			{
-				if ([theEvent modifierFlags] & NSControlKeyMask) {
-	      	[super keyDown: theEvent];
-	    	} else {
-	    		[self moveRight];
-				}
-			}
-	  	return;
-      
-		case NSCarriageReturnCharacter:
+   }
+    
+   if ([characters length] > 0)
+      character = [characters characterAtIndex: 0];
+  
+   switch (character) {
+      case 27:
+         column = [self lastLoadedColumn];
+    
+         if (column) {
+            matrix = [column cmatrix];
+            if (matrix != nil)
+               [matrix deselectAllCells];
+         }
+
+         RELEASE(charBuffer);
+         charBuffer = nil;
+         return;
+    case NSUpArrowFunctionKey:
+    case NSDownArrowFunctionKey:
+      [super keyDown: theEvent];
+      return;
+    case NSLeftArrowFunctionKey:
+      if ([theEvent modifierFlags] & NSControlKeyMask) {
+        [super keyDown: theEvent];
+      } else {
+          [self moveLeft];
+      }
+      return;
+    case NSRightArrowFunctionKey:
+      if ([theEvent modifierFlags] & NSControlKeyMask) {
+            [super keyDown: theEvent];
+      } else {
+        [self moveRight];
+      }
+      return;
+    case NSCarriageReturnCharacter:
       [(FSNBrowserMatrix *)matrix setMouseFlags: [theEvent modifierFlags]];
       [matrix sendDoubleAction];
+      /* release the char buffer! */
+          RELEASE(charBuffer);
+          charBuffer = nil;
       return;
-  }  
+  }
   
-  if (([characters length] > 0) && (character < 0xF700)) {														
+  if (([characters length] > 0) && (character < 0xF700)) {                            
     column = [self lastLoadedColumn];
     
-		if (column) {
-			int index = [column index];
+    if (column) {
+      int index = [column index];
 
-	  	matrix = [column cmatrix];
+      matrix = [column cmatrix];
 
       if (matrix == nil) {
         return;
       }
       
-	  	if (charBuffer == nil) {
-	      charBuffer = [characters substringToIndex: 1];
-	      RETAIN (charBuffer);
-	    } else {
-	      if (([theEvent timestamp] - lastKeyPressed < 500.0)
-		  											      && (alphaNumericalLastColumn == index)) {
+      if (charBuffer == nil) {
+        charBuffer = [characters substringToIndex: 1];
+        RETAIN (charBuffer);
+      } else {
+        if (([theEvent timestamp] - lastKeyPressed < 500.0)
+                                  && (alphaNumericalLastColumn == index)) {
           NSString *transition = [charBuffer stringByAppendingString:
-				                                      [characters substringToIndex: 1]];
-		      RELEASE (charBuffer);
-		      charBuffer = transition;
-		      RETAIN (charBuffer);
-				} else {
-		      RELEASE (charBuffer);
-		      charBuffer = [characters substringToIndex: 1];
-		      RETAIN (charBuffer);
-				}														
-			}
-			
-			alphaNumericalLastColumn = index;
-			lastKeyPressed = [theEvent timestamp];
-			
+                                              [characters substringToIndex: 1]];
+          RELEASE (charBuffer);
+          charBuffer = transition;
+          RETAIN (charBuffer);
+        } else {
+          RELEASE (charBuffer);
+          charBuffer = [characters substringToIndex: 1];
+          RETAIN (charBuffer);
+        }                            
+      }
+      
+      alphaNumericalLastColumn = index;
+      lastKeyPressed = [theEvent timestamp];
+      
       if ([column selectCellWithPrefix: charBuffer]) {
         [[self window] makeFirstResponder: matrix];
         return;
       }
-		}
-		
-		lastKeyPressed = 0.0;			
-	}  
+    }
+    
+    lastKeyPressed = 0.0;      
+  }  
   
   [super keyDown: theEvent];
 }

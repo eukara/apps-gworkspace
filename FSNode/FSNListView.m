@@ -2514,6 +2514,12 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 	}
 
   switch (character) {
+    case 27: /* Escape */
+        [self unselectOtherReps: nil];
+        [self selectionDidChange];
+        RELEASE(charBuffer);
+        charBuffer = nil;
+        return;
     case NSPageUpFunctionKey:
       [dsource stopRepNameEditing];
 		  vRect = [self visibleRect];
@@ -2554,6 +2560,9 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
         BOOL closesndr = ((flags == NSAlternateKeyMask) 
                                   || (flags == NSControlKeyMask));
         [dsource openSelectionInNewViewer: closesndr];
+
+        RELEASE(charBuffer);
+        charBuffer = nil;
         return;
       }
       

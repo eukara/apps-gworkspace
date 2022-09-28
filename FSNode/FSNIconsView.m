@@ -657,12 +657,17 @@ pp.y = NSMaxY(br) + 1; \
 
   characters = [theEvent characters];
   character = 0;
-		
+
   if ([characters length] > 0)
     character = [characters characterAtIndex: 0];
 
-	
   switch (character) {
+    case 27: /* Escape */
+        [self unselectOtherReps: nil];
+        [self selectionDidChange];
+        RELEASE(charBuffer);
+        charBuffer = nil;
+        return;
     case NSPageUpFunctionKey:
 		  vRect = [self visibleRect];
 		  p = vRect.origin;    
@@ -719,6 +724,9 @@ pp.y = NSMaxY(br) + 1; \
         BOOL closesndr = ((flags == NSAlternateKeyMask) 
                                   || (flags == NSControlKeyMask));
         [self openSelectionInNewViewer: closesndr];
+
+        RELEASE(charBuffer);
+        charBuffer = nil;
         return;
       }
 

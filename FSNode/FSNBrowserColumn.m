@@ -795,47 +795,30 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (BOOL)selectCellWithPrefix:(NSString *)prefix
 {
-  if ([[matrix cells] count])
-    {
-      NSInteger n = [matrix numberOfRows];
-      NSInteger s = [matrix selectedRow];
-      NSString *cellStr = nil;
-      NSUInteger i = 0;
+  if ([[matrix cells] count]) {
+    NSInteger n = [matrix numberOfRows];
+    NSInteger s = [matrix selectedRow];
+    NSString *cellStr = nil;
+    NSUInteger i = 0;
 
-      // Nothing eselected
-      if (s != -1)
-	cellStr = [[matrix cellAtRow: s column: 0] stringValue];
+    // Nothing eselected
+    if (s != -1)
+      cellStr = [[matrix cellAtRow: s column: 0] stringValue];
 
-      if (cellStr && ([cellStr length] > 0) && [cellStr hasPrefix: prefix])
-	return YES;
+    if (cellStr && ([cellStr length] > 0) && [cellStr hasPrefix: prefix])
+      return YES;
 
-      for (i = s + 1; i < n; i++)
-	{
-	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
+    for (i = s + 1; i < n; i++) {
+      cellStr = [[matrix cellAtRow: i column: 0] stringValue];
 
-	  if (([cellStr length] > 0) && ([cellStr hasPrefix: prefix]))
-	    {
-	      [matrix deselectAllCells];
-	      [matrix selectCellAtRow: i column: 0];
-	      [matrix scrollCellToVisibleAtRow: i column: 0];
-	      [matrix sendAction];
-	      return YES;
-	    }
-	}
-
-      for (i = 0; i < s; i++)
-	{
-	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
-
-	  if (([cellStr length] > 0) && ([cellStr hasPrefix: prefix]))
-	    {
-	      [matrix deselectAllCells];
-	      [matrix selectCellAtRow: i column: 0];
-	      [matrix scrollCellToVisibleAtRow: i column: 0];
-	      [matrix sendAction];
-	      return YES;
-	    }
-	}
+      if (([cellStr length] > 0) && ([cellStr hasPrefix: prefix])) {
+        [matrix deselectAllCells];
+        [matrix selectCellAtRow: i column: 0];
+        [matrix scrollCellToVisibleAtRow: i column: 0];
+        //[matrix sendAction];
+        return YES;
+      }
+    }
     }
 
   return NO;
